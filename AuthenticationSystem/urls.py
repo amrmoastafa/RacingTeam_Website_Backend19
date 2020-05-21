@@ -14,7 +14,7 @@ urlpatterns = [
     path('api-token-auth/', rest_views.obtain_auth_token),
     path('token-verify/',verify_jwt_token),
     path('forget-password/',views.ForgetPasswordView.as_view()),
-    path('login/',views.SignInView.as_view()),
+    # path('login/',views.SignInView.as_view()),
     path('change-password/',views.ChangePasswordView.as_view())
 ]
 

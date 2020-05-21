@@ -18,13 +18,7 @@ from django.contrib.auth import authenticate
 import random,string
 from .models import Error
 import datetime
-
-
-def log_errors(ex,id):
-    now = datetime.datetime.now()
-    user=User.objects.filter(id=id).first()
-    error = Error(user = user , error = ex , time = now)
-    error.save()
+from ProfileSystem.views import log_errors
 
 
 def password_generator(length = 8, chars=string.ascii_letters + '@%_' ):
@@ -41,7 +35,7 @@ class SignUpView(APIView):
                 except KeyError:
                     return Response({"error": "Some data is missing"}, status=status.HTTP_400_BAD_REQUEST)
                 try:
-                    User.objects.get(username=serializer.validated_data["email"])
+                    user = User.objects.get(email=serializer.validated_data["email"])
                 except User.DoesNotExist:
                     try:
                         user = User.objects.create_user(username = serializer.validated_data['email'],email = serializer.validated_data['email'])
@@ -57,7 +51,10 @@ class SignUpView(APIView):
                     except:
                         return Response({"error": "Please try again later"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
                 else:
-                    return Response({"error": "User exists before."}, status=status.HTTP_406_NOT_ACCEPTABLE)
+                    if user.email != user.username:
+                        return Response({"error": "User exists as social account."}, status=status.HTTP_406_NOT_ACCEPTABLE)
+                    else:
+                        return Response({"error": "User exists before."}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -246,7 +243,7 @@ class ForgetPasswordView(APIView):
                 return Response({"error": "some data is missing"}, status=status.HTTP_400_BAD_REQUEST)
             try:
                 #check that a user with that email already exist
-                user = User.objects.get(username=request.data["email"])
+                user = User.objects.get(email=request.data["email"])
                 if user.email!=user.username:
                     return Response({"error": "Can't reset a social account password"}, status=status.HTTP_401_UNAUTHORIZED)
             except User.DoesNotExist:

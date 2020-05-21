@@ -27,34 +27,34 @@ class UsersSignUpSerializer(serializers.ModelSerializer):
         model = User
         fields = ('password', 'email')
 
-class UsersSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('password', 'email','remember_me')
-    # email = serializers.CharField()
-    # password = serializers.CharField()
-    # tdvalue = serializers.DecimalField(max_digits = 10000, decimal_places = 0)
-    remember_me = serializers.CharField()
-    def validate (self, data):
-        email = data.get("email", "")
-        password = data.get("password", "")
+# class UsersSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = ('password', 'email','remember_me')
+#     # email = serializers.CharField()
+#     # password = serializers.CharField()
+#     # tdvalue = serializers.DecimalField(max_digits = 10000, decimal_places = 0)
+#     remember_me = serializers.CharField()
+#     def validate (self, data):
+#         email = data.get("email", "")
+#         password = data.get("password", "")
 
-        if username and password:
-            user = authenticate(username = email , password = password)
-            if user:
-                if user.is_active:
-                    data["user"] = user
-                else:
-                    msg = "Account is not Activated"
-                    return Response(msg, status = 400)
+#         if username and password:
+#             user = authenticate(username = email , password = password)
+#             if user:
+#                 if user.is_active:
+#                     data["user"] = user
+#                 else:
+#                     msg = "Account is not Activated"
+#                     return Response(msg, status = 400)
 
-            else:
-                msg = "Unable to login using the given cridentials."
-                return Response(msg, status = 400)
-        else:
-            msg = "Must provide username and password"
-            return Response(msg , status = 400)
-        return data
+#             else:
+#                 msg = "Unable to login using the given cridentials."
+#                 return Response(msg, status = 400)
+#         else:
+#             msg = "Must provide username and password"
+#             return Response(msg , status = 400)
+#         return data
 
 
 class UsersSignInSerializer(serializers.ModelSerializer):
