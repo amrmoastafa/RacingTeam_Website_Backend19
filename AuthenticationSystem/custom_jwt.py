@@ -1,7 +1,7 @@
 import jwt
 import uuid
 import warnings
-
+# from signup.models import Errors
 from calendar import timegm
 import datetime as date
 
@@ -10,12 +10,12 @@ from datetime import datetime
 from rest_framework_jwt.compat import get_username
 from rest_framework_jwt.compat import get_username_field
 from rest_framework_jwt.settings import api_settings
-from AuthSystem.serializers import GroupSerializer
+# from AuthSystem.serializers import GroupSerializer
 import json
-from ProfileSystem.models import Profile
+# from ProfileSystem.models import Profile
 
 
-def jwt_payload_handler(user, stay_logged_in):
+def jwt_payload_handler(user, tdvalue):
     username_field = get_username_field()
     username = get_username(user)
 
@@ -25,9 +25,9 @@ def jwt_payload_handler(user, stay_logged_in):
         DeprecationWarning
     )
 
-    if stay_logged_in == 1:
+    if tdvalue == 'true':
         expiry_date = datetime.utcnow() + date.timedelta(days=30)  # User's tokens will expiry on new year's day
-    elif stay_logged_in == 0:  # Tokens will expiry after the default expiration time has passed.
+    elif tdvalue == 'false':  # Tokens will expiry after the default expiration time has passed.
         expiry_date = datetime.utcnow() + api_settings.JWT_EXPIRATION_DELTA
     else:
         expiry_date = datetime.utcnow() + date.timedelta(hours=2)
@@ -35,27 +35,27 @@ def jwt_payload_handler(user, stay_logged_in):
     try:
         position=user.groups.all()[0].name
     except IndexError:
-        position = "NOT_VERIFIED"
-    try:
-        prof=Profile.objects.get(user__pk=user.pk)
-        first_name = prof.firstName
-        if prof.profilePic:
+        position = "Waiting Verification"
+    # try:
+    #     prof=Profile.objects.get(user__pk=user.pk)
+    #     first_name = prof.firstName
+    #     if prof.profilePic:
 
-            profilePic = prof.profilePic.url
-        else:
-            profilePic = ''
-
-    except Profile.DoesNotExist:
-        profilePic = 'http://sys.asuracingteam.org/media/media/ProfileSystem/profile_pictures/88555f84-433.jpg'
-        first_name = ''
-
+    #         profilePic = prof.profilePic.url
+    #     else:
+    #         profilePic = ''
+            
+    # except Profile.DoesNotExist:
+    #     profilePic = 'http://sys.asuracingteam.org/media/media/ProfileSystem/profile_pictures/88555f84-433.jpg'
+    #     first_name = ''
+    
     payload = {
         'user_id': user.pk,
         'username': username,
         'exp': expiry_date,
         'position': position,
-        'name': first_name,
-        'pic':profilePic
+        # 'name': first_name,
+        # 'pic':profilePic
     }
 
 
@@ -83,3 +83,8 @@ def jwt_payload_handler(user, stay_logged_in):
     # payload['position']=groupsRecieved[0]['name']
 
     return payload
+
+# def Error_Handler(user, e):
+#     error = str(e)
+#     username = user.username
+#     time = datetime.utcnow()
